@@ -79,6 +79,8 @@ namespace ClosedLoop
 
 	// Methods in the tuning module
 	void PerformTune() noexcept;
+
+	void NotifyClosedLoopPIDTerms() noexcept;
 }
 
 #  if defined(EXP1HCLv1_0) || defined(M23CL)

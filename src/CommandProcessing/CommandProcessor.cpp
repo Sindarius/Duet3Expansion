@@ -1005,6 +1005,7 @@ void CommandProcessor::Spin()
 			requestId = buf->msg.generic.requestId;
 # if SUPPORT_CLOSED_LOOP
 			rslt = ClosedLoop::ProcessM569Point1(buf->msg.generic, replyRef);
+			ClosedLoop::NotifyClosedLoopPIDTerms();
 # else
 			rslt = GCodeResult::errorNotSupported;
 # endif

@@ -457,6 +457,21 @@ GCodeResult ClosedLoop::ProcessM569Point1(const CanMessageGeneric &msg, const St
 	return GCodeResult::ok;
 }
 
+void ClosedLoop::NotifyClosedLoopPIDTerms() noexcept {
+	//JER: Send a message back with updated PID terms to update object model.
+	CanMessageBuffer statusBuf;
+	CanMessageClosedLoopPIDStatus& statusMsg = *(statusBuf.SetupStatusMessage<CanMessageClosedLoopPIDStatus>(CanInterface::GetCanAddress(), CanInterface::GetCurrentMasterAddress()));
+	statusMsg.SetClosedLoopPTerm(Kp);
+	statusMsg.SetClosedLoopITerm(Ki);
+	statusMsg.SetClosedLoopDTerm(Kd);
+	statusMsg.SetClosedLoopVTerm(Kv);
+	statusMsg.SetClosedLoopATerm(Ka);
+	statusMsg.zero = 0;
+	// Send the CAN message
+	statusBuf.dataLength = statusMsg.GetActualDataLength();
+	CanInterface::Send(&statusBuf);
+}
+
 GCodeResult ClosedLoop::ProcessM569Point5(const CanMessageStartClosedLoopDataCollection& msg, const StringRef& reply) noexcept
 {
 	if (encoder == nullptr || msg.deviceNumber != 0)
@@ -1206,6 +1221,7 @@ StandardDriverStatus ClosedLoop::ModifyDriverStatus(size_t driver, StandardDrive
 
 	return originalStatus;
 }
+
 
 #endif
 
